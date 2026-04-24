@@ -1,11 +1,11 @@
 # StopLightSim.py
-# Name:
-# Date:
-# Assignment:
+# Name: Mia Garcia
+# Date: 4/23/26
+# Assignment: Lab 11
 
 import simpy
 
-# Global variable to track light state
+
 greenLight = True
 
 
@@ -27,26 +27,27 @@ def stopLight(env):
 
 
 def car(env, car_id):
-    """Simulates a car arriving and waiting for the light."""
-    
+
     print("Car", car_id, "arrived at", env.now)
 
-    # TODO: Make the car wait while the light is red
-    # Hint: use a loop and env.timeout(1)
+    global greenLight
+
+    while not greenLight:
+        print("Car", car_id, "waiting at", env.now)
+        yield env.timeout(1)
 
     print("Car", car_id, "departed at", env.now)
 
 
 def carArrival(env):
-    """Creates cars at regular intervals."""
-    
+
     car_id = 0
 
     while True:
         car_id += 1
         print("Creating Car", car_id)
 
-        # TODO: Start a new car process
+        env.process(car(env, car_id))
 
         yield env.timeout(5)
 
@@ -54,12 +55,10 @@ def carArrival(env):
 def main():
     env = simpy.Environment()
 
-    # Start processes
     env.process(stopLight(env))
-    
-    # TODO: Start the carArrival process
 
-    # Run simulation
+    env.process(carArrival(env))
+
     env.run(until=100)
 
     print("Simulation complete")
